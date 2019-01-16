@@ -23,6 +23,14 @@ defmodule EtsAl.Keeper do
   end
 
   ### API for Table manipulation
+
+  @doc """
+  Return info for the table
+  """
+    def table_info(table_id) when is_atom(table_id), do: :ets.info(table_id)
+
+  def table_info(_table_id), do: Forensic.error(:invalid_params)
+
   @doc """
   Create a table under the Keeper's PID (ownership)
   """
