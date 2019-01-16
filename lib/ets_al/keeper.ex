@@ -59,7 +59,7 @@ defmodule EtsAl.Keeper do
     create_table(table_id, [:bag, :public, :named_table, read_concurrency: true])
   end
 
-  def create_public_bag(table_id),
+  def create_public_bag(_table_id),
     do: Forensic.error( :invalid_params)
 
   @doc """
@@ -207,7 +207,7 @@ defmodule EtsAl.Keeper do
   def key_exists?(table_id, key)
       when is_atom(table_id) and not is_nil(key) do
     try do
-      :ets.member(table_id, key)
+      {:ok, :ets.member(table_id, key)}
     rescue
       e -> Forensic.error(e)
     end
