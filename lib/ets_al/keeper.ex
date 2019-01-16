@@ -27,7 +27,7 @@ defmodule EtsAl.Keeper do
   @doc """
   Return info for the table
   """
-    def table_info(table_id) when is_atom(table_id), do: :ets.info(table_id)
+  def table_info(table_id) when is_atom(table_id), do: :ets.info(table_id)
 
   def table_info(_table_id), do: Forensic.error(:invalid_params)
 
@@ -60,7 +60,7 @@ defmodule EtsAl.Keeper do
   end
 
   def create_public_bag(table_id),
-    do: {:error, {__ENV__.function, __ENV__.current_vars, :invalid_params, table_id}}
+    do: Forensic.error( :invalid_params)
 
   @doc """
   Clear a table under the Keeper's PID (ownership)
@@ -95,7 +95,7 @@ defmodule EtsAl.Keeper do
   def tab2list(table_id) when is_atom(table_id) do
     case table_exists?(table_id) do
       true -> {:ok, :ets.tab2list(table_id)}
-      false -> {:error, {__ENV__.function, __ENV__.current_vars, :table_not_exists, table_id}}
+      false -> Forensic.error(:table_not_exists)
     end
   end
 
@@ -131,14 +131,14 @@ defmodule EtsAl.Keeper do
 
   {:ok, true} on success,
 
-  {:error, description} in case of error.
+  Forensic.error(description) in case of error.
   """
   def insert(table_id, key, values)
       when is_atom(table_id) and not is_nil(key) and is_list(values) do
     try do
       {:ok, :ets.insert(table_id, List.to_tuple([key] ++ values))}
     rescue
-      e -> {:error, e}
+      e -> Forensic.error(e)
     end
   end
 
@@ -154,7 +154,7 @@ defmodule EtsAl.Keeper do
 
   {:ok, false} if key does not exists in the table,
 
-  {:error, description} in case of error.
+  Forensic.error(description) in case of error.
   """
 
   def update(table_id, key, values)
@@ -178,14 +178,14 @@ defmodule EtsAl.Keeper do
 
   {:ok, false} if key already exists,
 
-  {:error, description} in case of error.
+  Forensic.error(description) in case of error.
   """
   def insert_new(table_id, key, values)
       when is_atom(table_id) and not is_nil(key) and not is_list(key) and is_list(values) do
     try do
       {:ok, :ets.insert_new(table_id, List.to_tuple([key] ++ values))}
     rescue
-      e -> {:error, e}
+      e -> Forensic.error(e)
     end
   end
 
@@ -197,7 +197,7 @@ defmodule EtsAl.Keeper do
     try do
       {:ok, :ets.delete(table_id, key)}
     rescue
-      e -> {:error, e}
+      e -> Forensic.error(e)
     end
   end
 
@@ -207,9 +207,9 @@ defmodule EtsAl.Keeper do
   def key_exists?(table_id, key)
       when is_atom(table_id) and not is_nil(key) do
     try do
-      {:ok, :ets.member(table_id, key)}
+      :ets.member(table_id, key)
     rescue
-      e -> {:error, e}
+      e -> Forensic.error(e)
     end
   end
 
@@ -262,24 +262,25 @@ defmodule EtsAl.Keeper do
         key -> {:ok, key}
       end
     rescue
-      e -> {:error, e}
+      e -> Forensic.error(e)
     end
   end
 
   def select(table_id, match_spec) when is_atom(table_id) do
     case table_exists?(table_id) do
       true -> {:ok, :ets.select(table_id, match_spec)}
-      false -> {:error, :table_not_exists}
+      false -> Forensic.error(:table_not_exists)
     end
   end
 
   def select(_table_id, _match_spec),
     do: Forensic.error(:invalid_params)
 
-  def select(table_id, match_spec, limit) when is_atom(table_id) and is_integer(limit) do
+  def select(table_id, match_spec, limit)
+      when is_atom(table_id) and is_integer(limit) and limit > 0 do
     case table_exists?(table_id) do
-      true -> {:ok, :ets.select_delete(table_id, match_spec)}
-      false -> {:error, :table_not_exists}
+      true -> {:ok, :ets.select(table_id, match_spec, limit)}
+      false -> Forensic.error(:table_not_exists)
     end
   end
 
@@ -289,7 +290,7 @@ defmodule EtsAl.Keeper do
   def select_delete(table_id, match_spec) when is_atom(table_id) do
     case table_exists?(table_id) do
       true -> {:ok, :ets.select_delete(table_id, match_spec)}
-      false -> {:error, :table_not_exists}
+      false -> Forensic.error(:table_not_exists)
     end
   end
 
@@ -303,7 +304,7 @@ defmodule EtsAl.Keeper do
          table_reference <- :ets.new(table_id, table_spec) do
       {:reply, {:ok, table_reference}, state ++ [table_id]}
     else
-      error -> {:reply, {:error, error}, state}
+      error -> {:reply, Forensic.error(error), state}
     end
   end
 
@@ -313,7 +314,7 @@ defmodule EtsAl.Keeper do
       {:reply, {:ok, true}, state}
     else
       {:reply,
-       {:error, {__ENV__.function, __ENV__.current_vars, :table_does_not_exist, table_id}}, state}
+       Forensic.error(:table_does_not_exist), state}
     end
   end
 
@@ -322,7 +323,7 @@ defmodule EtsAl.Keeper do
       :ets.delete(table_id)
       {:reply, {:ok, table_id}, List.delete(state, table_id)}
     else
-      {:reply, {:error, table_id}, state}
+      {:reply, Forensic.error(table_id), state}
     end
   end
 
@@ -340,12 +341,12 @@ defmodule EtsAl.Keeper do
          {:ok, _} <- :ets.file2tab(path) do
       {:reply, {:ok, table_id}, state ++ [table_id]}
     else
-      _error -> {:reply, {:error, table_id}, state}
+      _error -> {:reply, Forensic.error(table_id), state}
     end
   end
 
   def handle_call({:file2tab, _path, _table_id}, _from, state) do
-    {:reply, {:error, :invalid_params}, state}
+    {:reply, Forensic.error(:invalid_params), state}
   end
 
   def handle_call({:tab2file, file_path, table_id}, _from, state)
@@ -359,7 +360,7 @@ defmodule EtsAl.Keeper do
          ), state ++ [table_id]}
 
       false ->
-        {:reply, {:error, :not_exists}, state}
+        {:reply, Forensic.error(:not_exists), state}
     end
   end
 
@@ -368,6 +369,6 @@ defmodule EtsAl.Keeper do
   end
 
   def table_exists?(_table_id) do
-    {:error, :invalid_table_id}
+    Forensic.error(:invalid_table_id)
   end
 end
