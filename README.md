@@ -7,7 +7,7 @@ ETS abstraction layer and assets keeper.
 ```elixir
 def deps do
   [
-    {:ets_al, "~> 0.1.0"}
+    {:ets_al, "~> 0.1.1"}
   ]
 end
 ```
