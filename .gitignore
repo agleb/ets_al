@@ -27,3 +27,4 @@ ets_al-*.tar
 /data*/
 /.elixir_ls/
 
+.vscode/launch.json

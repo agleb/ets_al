@@ -71,7 +71,6 @@ defmodule EtsAlTest do
                 {62, 620, 6200},
                 {63, 630, 6300}
               ]}
-
     assert {:ok, _} = clear_table(:table_id)
     assert {:ok, nil} = fetch(:table_id, 54)
     assert {:ok, _} = delete_table(:table_id)
