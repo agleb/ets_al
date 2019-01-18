@@ -7,7 +7,7 @@ ETS abstraction layer and assets keeper.
 ```elixir
 def deps do
   [
-    {:ets_al, "~> 0.1.1"}
+    {:ets_al, "~> 0.1.2"}
   ]
 end
 ```
@@ -19,6 +19,8 @@ Start the EtsAl.Keeper under your supervision tree in the right place to keep yo
 ```elixir
 require EtsAl.Keeper
 ```
+
+Alternatively you can use EtsAl.Behaviour in your module as a boilerplate for your ETS operations engine.
 
 ## TODO
 
