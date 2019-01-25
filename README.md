@@ -1,5 +1,7 @@
 # EtsAl
 
+[![Hex.pm](https://img.shields.io/hexpm/v/ets_al.svg)](https://hex.pm/packages/ets_al)
+
 ETS abstraction layer and assets keeper.
 
 ## Installation
