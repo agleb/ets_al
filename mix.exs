@@ -28,7 +28,7 @@ defmodule EtsAl.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.14", only: :dev},
-      {:forensic, "~> 0.1.0"}
+      {:forensic, "~> 0.2.0"}
     ]
   end
 
