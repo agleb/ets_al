@@ -132,7 +132,7 @@ defmodule EtsAl.Behaviour do
 
       {:ok, true} on success,
 
-      {:error, description) in case of error}
+      {:error, description} in case of error
       """
       def insert(table_id, key, values)
           when is_atom(table_id) and not is_nil(key) and is_list(values) do
@@ -155,7 +155,7 @@ defmodule EtsAl.Behaviour do
 
       {:ok, false} if key does not exists in the table,
 
-      {:error, description) in case of error}
+      {:error, description} in case of error
       """
 
       def update(table_id, key, values)
@@ -179,7 +179,7 @@ defmodule EtsAl.Behaviour do
 
       {:ok, false} if key already exists,
 
-      {:error, description) in case of error}
+      {:error, description} in case of error
       """
       def insert_new(table_id, key, values)
           when is_atom(table_id) and not is_nil(key) and not is_list(key) and is_list(values) do
