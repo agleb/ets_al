@@ -372,7 +372,8 @@ defmodule EtsAl.Behaviour do
       def table_exists?(_table_id) do
         Forensic.error(:invalid_table_id)
       end
+
+      defoverridable init: 1, start_link: 1
     end
   end
 end
-
