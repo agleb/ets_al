@@ -27,8 +27,7 @@ defmodule EtsAl.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.14", only: :dev},
-      {:forensic, "~> 0.2.0"}
+      {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
 

@@ -26,5 +26,6 @@ ets_al-*.tar
 /log*/
 /data*/
 /.elixir_ls/
+/.history
 
 .vscode/launch.json
